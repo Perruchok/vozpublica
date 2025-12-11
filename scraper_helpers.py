@@ -6,7 +6,13 @@ import re
 import html
 from datetime import datetime, timezone
 from zoneinfo import ZoneInfo
-from supabase import create_client
+try:
+    from supabase import create_client
+except Exception:
+    # Allow the module to be imported in test environments where supabase
+    # client isn't installed. Functions that need an active client (e.g.
+    # save_new_metadata) should handle supabase being None.
+    create_client = None
 
 BASE_URL = "https://www.gob.mx"
 PAGE_URL_TEMPLATE = "https://www.gob.mx/presidencia/es/archivo/articulos?page={}"
@@ -14,7 +20,13 @@ HEADERS = {"User-Agent": "Mozilla/5.0"}
 
 url = "https://yelycfehdjepwkzheumv.supabase.co"
 key = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InllbHljZmVoZGplcHdremhldW12Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQwMDIyMzYsImV4cCI6MjA3OTU3ODIzNn0.HSETZUpaiqzdRmjwjdFOrHesGPhrccXsRT82ClnjikA"
-supabase = create_client(url, key)
+if create_client is not None:
+    try:
+        supabase = create_client(url, key)
+    except Exception:
+        supabase = None
+else:
+    supabase = None
 
 ####### Scrapping Helper Functions #######
 
@@ -222,7 +234,25 @@ def add_articles_metadata(articles):
             suffix = 'conference'
         return f"{date_part}-{suffix}"
 
+    # Generate base doc_id values first
     df['doc_id'] = df.apply(make_doc_id, axis=1)
+
+    # Ensure doc_id uniqueness within this dataframe: if duplicates exist in the
+    # scraped batch (e.g. two articles producing the same base id), append
+    # a numeric suffix 2,3,... to subsequent occurrences so insertions to the DB
+    # won't fail due to unique constraint violations.
+    counts = {}
+    unique_ids = []
+    for base_id in df['doc_id'].tolist():
+        if base_id in counts:
+            counts[base_id] += 1
+            new_id = f"{base_id}{counts[base_id]}"
+        else:
+            counts[base_id] = 1
+            new_id = base_id
+        unique_ids.append(new_id)
+
+    df['doc_id'] = unique_ids
     return df
 
 def save_new_metadata(df_scraped: pd.DataFrame):
@@ -252,3 +282,33 @@ def save_new_metadata(df_scraped: pd.DataFrame):
         supabase.table("raw_transcripts_meta").insert(batch).execute()
 
     print(f"Inserted {len(new_records)} new metadata records.")
+
+def get_missing_articles_meta():
+    """
+    Returns doc_id values that exist in `raw_transcripts_meta` but are NOT present
+    in `speech_turns`.
+    Returns a pandas.DataFrame with columns ['doc_id', 'href'] for missing articles. 
+    This function fetches `doc_id` + `href` from `raw_transcripts_meta` so the
+    caller receives the original link along with the id that needs processing.
+    """
+
+    # --- Get doc_ids + hrefs from raw_transcripts_meta ---
+    meta_resp = supabase.table("raw_transcripts_meta").select("doc_id, href").execute()
+    meta_rows = meta_resp.data or []
+
+    meta_ids = {row["doc_id"] for row in meta_rows}
+    # Map doc_id -> href (may be None)
+    meta_href_map = {row["doc_id"]: row.get("href") for row in meta_rows}
+
+    # --- Get doc_ids already present in speech_turns ---
+    article_resp = supabase.table("speech_turns").select("doc_id").execute()
+    article_rows = article_resp.data or []
+    article_ids = {row["doc_id"] for row in article_rows}
+
+    # --- Calculate missing ones ---
+    missing_doc_ids = sorted(list(meta_ids - article_ids))
+
+   
+    import pandas as pd
+    rows = [{"doc_id": did, "href": meta_href_map.get(did)} for did in missing_doc_ids]
+    return pd.DataFrame(rows)
