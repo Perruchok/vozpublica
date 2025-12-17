@@ -108,7 +108,7 @@ class DummySupabase:
         return DummyTable(self, name)
 
 
-def test_supabase_loading_serializes_timestamps_and_numpy(monkeypatch):
+def test_database_loading_serializes_timestamps_and_numpy(monkeypatch):
     dummy = DummySupabase()
     monkeypatch.setattr(ph, "supabase", dummy)
 
@@ -131,7 +131,7 @@ def test_supabase_loading_serializes_timestamps_and_numpy(monkeypatch):
     ])
 
     # Should not raise
-    ph.supabase_loading(raw, embedded)
+    ph.database_loading(raw, embedded)
 
     # Validate raw table call
     assert "raw_transcripts" in dummy.last_calls
@@ -150,7 +150,7 @@ def test_supabase_loading_serializes_timestamps_and_numpy(monkeypatch):
     assert all(isinstance(x, float) for x in emb_rec["embedding"]) 
 
 
-def test_supabase_loading_dedupes(monkeypatch):
+def test_database_loading_dedupes(monkeypatch):
     dummy = DummySupabase()
     monkeypatch.setattr(ph, "supabase", dummy)
 
@@ -163,8 +163,8 @@ def test_supabase_loading_dedupes(monkeypatch):
         {"doc_id": "A", "sequence": 1, "chunk_id": None, "text": "nochunk-dup"},
     ])
 
-    # supabase_loading should NOT add a 'row_id' or 'speech_id' column on its own
-    ph.supabase_loading(raw, embedded)
+    # database_loading should NOT add a 'row_id' or 'speech_id' column on its own
+    ph.database_loading(raw, embedded)
     assert "speech_turns" in dummy.last_calls
     records = dummy.last_calls["speech_turns"]
     assert all("row_id" not in r for r in records)
