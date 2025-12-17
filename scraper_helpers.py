@@ -6,30 +6,21 @@ import re
 import html
 from datetime import datetime, timezone
 from zoneinfo import ZoneInfo
-try:
-    from supabase import create_client
-except Exception:
-    # Allow the module to be imported in test environments where supabase
-    # client isn't installed. Functions that need an active client (e.g.
-    # save_new_metadata) should handle supabase being None.
-    create_client = None
+import psycopg2
+import os
 
 BASE_URL = "https://www.gob.mx"
 PAGE_URL_TEMPLATE = "https://www.gob.mx/presidencia/es/archivo/articulos?page={}"
 HEADERS = {"User-Agent": "Mozilla/5.0"}
 
-url = "https://yelycfehdjepwkzheumv.supabase.co"
-key = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InllbHljZmVoZGplcHdremhldW12Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQwMDIyMzYsImV4cCI6MjA3OTU3ODIzNn0.HSETZUpaiqzdRmjwjdFOrHesGPhrccXsRT82ClnjikA"
-if create_client is not None:
-    try:
-        supabase = create_client(url, key)
-    except Exception:
-        supabase = None
-else:
-    supabase = None
+# Azure PostgreSQL connection settings
+pg_host = os.environ.get("PGHOST")
+pg_user = os.environ.get("PGUSER")
+pg_password = os.environ.get("PGPASSWORD")
+pg_db = os.environ.get("PGDATABASE")
+pg_port = os.environ.get("PGPORT", "5432")
 
 ####### Scrapping Helper Functions #######
-
 def clean_url(url):
     """Remove escaped characters and quotes from URL"""
     if not url:
@@ -258,30 +249,46 @@ def add_articles_metadata(articles):
 def save_new_metadata(df_scraped: pd.DataFrame):
     """
     Take a pandas DataFrame with scraped metadata and insert only new records
-    into the Supabase table 'raw_transcripts_meta', deduplicated by doc_id.
+    into the Azure PostgreSQL table 'raw_transcripts_meta', deduplicated by doc_id.
     """
+    # Connect to Azure PostgreSQL
+    conn = psycopg2.connect(
+        host=pg_host,
+        database=pg_db,
+        user=pg_user,
+        password=pg_password,
+        port=pg_port
+    )
+    cur = conn.cursor()
 
-    # --- 1. Fetch existing doc_ids already stored in Supabase ---
-    existing = supabase.table("raw_transcripts_meta").select("doc_id").execute()
-    existing_ids = {row["doc_id"] for row in existing.data}
+    try:
+        # --- 1. Fetch existing doc_ids already stored in Azure ---
+        cur.execute("SELECT doc_id FROM raw_transcripts_meta")
+        existing_ids = {row[0] for row in cur.fetchall()}
 
-    # --- 2. Filter the DataFrame to keep only new metadata ---
-    df_new = df_scraped[~df_scraped["doc_id"].isin(existing_ids)]
+        # --- 2. Filter the DataFrame to keep only new metadata ---
+        df_new = df_scraped[~df_scraped["doc_id"].isin(existing_ids)]
 
-    if df_new.empty:
-        print("No new metadata to insert.")
-        return
+        if df_new.empty:
+            print("No new metadata to insert.")
+            return
 
-    # Convert to list of dicts for Supabase
-    new_records = df_new.to_dict(orient="records")
+        # --- 3. Insert new records ---
+        inserted_count = 0
+        for _, row in df_new.iterrows():
+            cur.execute("""
+                INSERT INTO raw_transcripts_meta (doc_id, href, title, published_at, scraped_at)
+                VALUES (%s, %s, %s, %s, %s)
+                ON CONFLICT (doc_id) DO NOTHING
+            """, (row['doc_id'], row['href'], row['title'], row['published_at'], row['scraped_at']))
+            inserted_count += 1
 
-    # --- 3. Insert in batches (Supabase tends to allow ~500 rows per insert) ---
-    BATCH_SIZE = 500
-    for i in range(0, len(new_records), BATCH_SIZE):
-        batch = new_records[i : i + BATCH_SIZE]
-        supabase.table("raw_transcripts_meta").insert(batch).execute()
-
-    print(f"Inserted {len(new_records)} new metadata records.")
+        conn.commit()
+        print(f"Inserted {inserted_count} new metadata records.")
+    
+    finally:
+        cur.close()
+        conn.close()
 
 def get_missing_articles_meta():
     """
@@ -291,24 +298,37 @@ def get_missing_articles_meta():
     This function fetches `doc_id` + `href` from `raw_transcripts_meta` so the
     caller receives the original link along with the id that needs processing.
     """
+    # Connect to Azure PostgreSQL
+    conn = psycopg2.connect(
+        host=pg_host,
+        database=pg_db,
+        user=pg_user,
+        password=pg_password,
+        port=pg_port
+    )
+    cur = conn.cursor()
 
-    # --- Get doc_ids + hrefs from raw_transcripts_meta ---
-    meta_resp = supabase.table("raw_transcripts_meta").select("doc_id, href").execute()
-    meta_rows = meta_resp.data or []
+    try:
+        # --- Get doc_ids + hrefs from raw_transcripts_meta ---
+        cur.execute("SELECT doc_id, href FROM raw_transcripts_meta")
+        meta_rows = cur.fetchall()
+        
+        meta_ids = {row[0] for row in meta_rows}
+        # Map doc_id -> href (may be None)
+        meta_href_map = {row[0]: row[1] for row in meta_rows}
 
-    meta_ids = {row["doc_id"] for row in meta_rows}
-    # Map doc_id -> href (may be None)
-    meta_href_map = {row["doc_id"]: row.get("href") for row in meta_rows}
+        # --- Get doc_ids already present in speech_turns ---
+        cur.execute("SELECT DISTINCT doc_id FROM speech_turns")
+        article_rows = cur.fetchall()
+        article_ids = {row[0] for row in article_rows}
 
-    # --- Get doc_ids already present in speech_turns ---
-    article_resp = supabase.table("speech_turns").select("doc_id").execute()
-    article_rows = article_resp.data or []
-    article_ids = {row["doc_id"] for row in article_rows}
+        # --- Calculate missing ones ---
+        missing_doc_ids = sorted(list(meta_ids - article_ids))
 
-    # --- Calculate missing ones ---
-    missing_doc_ids = sorted(list(meta_ids - article_ids))
-
-   
-    import pandas as pd
-    rows = [{"doc_id": did, "href": meta_href_map.get(did)} for did in missing_doc_ids]
-    return pd.DataFrame(rows)
+        import pandas as pd
+        rows = [{"doc_id": did, "href": meta_href_map.get(did)} for did in missing_doc_ids]
+        return pd.DataFrame(rows)
+    
+    finally:
+        cur.close()
+        conn.close()

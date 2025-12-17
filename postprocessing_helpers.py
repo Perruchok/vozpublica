@@ -7,26 +7,41 @@ import pandas as pd
 from datetime import datetime, date
 import random
 import time
+import psycopg2
+from psycopg2.extras import Json
 # Import normalized speaker helpers from shared module
 from text_utils import parse_speaker_raw
+import os
+from openai import AzureOpenAI
+import tiktoken
 
+# Database settings from environment variables
+pg_host = os.environ["PGHOST"]
+pg_user = os.environ["PGUSER"]
+pg_password = os.environ["PGPASSWORD"]
+pg_db = os.environ["PGDATABASE"]
+pg_port = os.environ.get("PGPORT", "5432")
+# Embedding model settings from environment variables
+azure_openai_endpoint = os.environ["AZURE_OPENAI_ENDPOINT"]
+azure_openai_api_key = os.environ["AZURE_OPENAI_API_KEY"]
+azure_openai_api_version = os.environ.get("AZURE_OPENAI_API_VERSION", "2024-12-01-preview")
+
+
+client = AzureOpenAI(
+    azure_endpoint=azure_openai_endpoint,
+    api_key=azure_openai_api_key,
+    api_version=azure_openai_api_version
+)
+
+# Usar el nombre de deployment/modelo (definido en la celda de configuración)
+# AZURE_DEPLOYMENT debe existir en el entorno de ejecución (se definió en la celda anterior)
+MODEL_FOR_ENCODING = globals().get("AZURE_DEPLOYMENT", "text-embedding-3-small")
+
+# Intentar obtener el encoding para el modelo desplegado; si falla, caer a cl100k_base
 try:
-    from supabase import create_client
+    ENCODER = tiktoken.encoding_for_model(MODEL_FOR_ENCODING)
 except Exception:
-    # Allow the module to be imported in test environments where supabase
-    # client isn't installed. Functions that need an active client (e.g.
-    # save_new_metadata) should handle supabase being None.
-    create_client = None
-url = "https://yelycfehdjepwkzheumv.supabase.co"
-key = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InllbHljZmVoZGplcHdremhldW12Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQwMDIyMzYsImV4cCI6MjA3OTU3ODIzNn0.HSETZUpaiqzdRmjwjdFOrHesGPhrccXsRT82ClnjikA"
-if create_client is not None:
-    try:
-        supabase = create_client(url, key)
-    except Exception:
-        supabase = None
-else:
-    supabase = None
-
+    ENCODER = tiktoken.get_encoding("cl100k_base")
     
 USER_AGENTS = [
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/... Chrome/120...",
@@ -56,7 +71,6 @@ def robust_fetch(url, retries=6):
             time.sleep(delay)
 
     raise Exception(f"Failed after {retries} attempts: {url}")
-
 
 def parse_article_page(url):
     """
@@ -194,32 +208,6 @@ def reformat_transcript(lines, doc_id):
 
     return out
 
-# Chunking and embedding helper functions
-from openai import AzureOpenAI
-import tiktoken # Tokenizer and chunker
-
-# client = AzureOpenAI(
-#     azure_endpoint=os.getenv("AZURE_OPENAI_ENDPOINT"),
-#     api_key=os.getenv("AZURE_OPENAI_API_KEY"),
-#     api_version="2024-08-01-preview"
-# )
-client = AzureOpenAI(
-    azure_endpoint="https://YOUR_ENDPOINT_HERE",
-    api_key="YOUR_API_KEY_HERE",
-    api_version="2024-12-01-preview"
-)
-
-
-# Usar el nombre de deployment/modelo (definido en la celda de configuración)
-# AZURE_DEPLOYMENT debe existir en el entorno de ejecución (se definió en la celda anterior)
-MODEL_FOR_ENCODING = globals().get("AZURE_DEPLOYMENT", "text-embedding-3-small")
-
-# Intentar obtener el encoding para el modelo desplegado; si falla, caer a cl100k_base
-try:
-    ENCODER = tiktoken.encoding_for_model(MODEL_FOR_ENCODING)
-except Exception:
-    ENCODER = tiktoken.get_encoding("cl100k_base")
-
 def count_tokens(text: str) -> int:
     return len(ENCODER.encode(text))
 
@@ -331,7 +319,6 @@ def embed_single_article(conference_data, max_tokens=450):
 
     return all_embeddings
 
-
 def _serialize_value(v):
     """Convert a single value into a JSON-serializable Python type.
 
@@ -393,7 +380,6 @@ def _serialize_value(v):
         # last resort stringify
         return str(v)
 
-
 def df_to_records_serializable(df):
     rows = df.to_dict(orient='records') if df is not None else []
     out = []
@@ -407,7 +393,6 @@ def df_to_records_serializable(df):
         # if still failing, coerce everything to str as last resort
         out = [{k: str(v) for k, v in r.items()} for r in out]
     return out
-
 
 def build_speech_id(row):
     doc = str(row["doc_id"])
@@ -426,7 +411,6 @@ def build_speech_id(row):
         chunk_str = str(chunk)
 
     return f"{doc}-{seq}-{chunk_str}"
-
 
 def dedupe_records_by_field(records, field="speech_id"):
     """Deduplicate a list of record dicts by `field`, preserving first-seen.
@@ -452,32 +436,60 @@ def dedupe_records_by_field(records, field="speech_id"):
         out.append(r)
     return out
 
-def supabase_loading(raw_df, embedded_df):
-    # import os
-    # SUPABASE_URL = os.getenv("SUPABASE_URL")
-    # SUPABASE_KEY = os.getenv("SUPABASE_KEY")
-
-    # supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
+def database_loading(raw_df, embedded_df):
+    # Connect to Azure PostgreSQL
+    conn = psycopg2.connect(
+        host=pg_host,
+        database=pg_db,
+        user=pg_user,
+        password=pg_password,
+        port=pg_port
+    )
+    cur = conn.cursor()
 
     # Payloads will be converted to JSON-serializable records with
     # the module-level helper `df_to_records_serializable`.
 
-    # Cargar raw_df a la tabla 'raw_transcripts'
-    try:
-        raw_payload = df_to_records_serializable(raw_df)
-        supabase.table('raw_transcripts').upsert(raw_payload).execute()
-    except Exception as e:
-        if "duplicate key value" in str(e):
-            print("Row already exists — skipping.")
-        else:
-            raise
+    raw_payload = df_to_records_serializable(raw_df)
+    embedded_payload = df_to_records_serializable(embedded_df)
 
-    # Cargar embedded_df a la tabla 'speech_turns'
-    try:
-        embedded_payload = df_to_records_serializable(embedded_df)
-        supabase.table('speech_turns').upsert(embedded_payload).execute()
-    except Exception as e:
-        if "duplicate key value" in str(e):
-            print("Row already exists — skipping.")
-        else:
-            raise
+    # Insert raw_transcripts
+    for record in raw_payload:
+        # raw_json contains the parsed article (url, title, subtitle, content)
+        raw_json_data = record.get('raw_json', {})
+        created_at = record.get('created_at')
+        
+        cur.execute("""
+            INSERT INTO raw_transcripts (doc_id, raw_json, created_at)
+            VALUES (%s, %s, %s)
+            ON CONFLICT (doc_id) DO UPDATE SET
+                raw_json = EXCLUDED.raw_json,
+                created_at = EXCLUDED.created_at
+        """, (record['doc_id'], Json(raw_json_data), created_at))
+
+    # Insert speech_turns
+    for record in embedded_payload:
+        cur.execute("""
+            INSERT INTO speech_turns (speech_id, doc_id, sequence, chunk_id, type, speaker_raw, speaker_normalized, role, text, embedding, token_count, created_at)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+            ON CONFLICT (speech_id) DO UPDATE SET
+                doc_id = EXCLUDED.doc_id,
+                sequence = EXCLUDED.sequence,
+                chunk_id = EXCLUDED.chunk_id,
+                type = EXCLUDED.type,
+                speaker_raw = EXCLUDED.speaker_raw,
+                speaker_normalized = EXCLUDED.speaker_normalized,
+                role = EXCLUDED.role,
+                text = EXCLUDED.text,
+                embedding = EXCLUDED.embedding,
+                token_count = EXCLUDED.token_count,
+                created_at = EXCLUDED.created_at
+        """, (record['speech_id'], record['doc_id'], record['sequence'], record['chunk_id'], record['type'], 
+              record['speaker_raw'], record['speaker_normalized'], record['role'], record['text'], 
+              Json(record['embedding']), record['token_count'], record.get('created_at')))
+
+    # Commit and close
+    conn.commit()
+    cur.close()
+    conn.close()
+    print("Data loaded to Azure PostgreSQL successfully.")
