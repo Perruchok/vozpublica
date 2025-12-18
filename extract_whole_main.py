@@ -1,4 +1,5 @@
 from postprocessing_helpers import parse_article_page, reformat_transcript, embed_single_article, database_loading, build_speech_id
+from scraper_helpers import get_missing_articles_meta
 import pandas as pd
 
 missing_articles_meta = get_missing_articles_meta()
