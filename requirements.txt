@@ -139,3 +139,8 @@ websocket-client==1.9.0
 websockets==15.0.1
 widgetsnbextension==4.0.15
 yarl==1.22.0
+psycopg2-binary==2.9.10
+umap-learn==0.5.7
+hdbscan==0.8.41
+scikit-learn==1.6.1
+asyncpg==0.30.0
