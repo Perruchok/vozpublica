@@ -1,0 +1,59 @@
+{ "COMMENT!": "Results got with 4187 records in the DB and a sample query." ,
+  "results": [
+    {
+      "doc_id": "2024-10-28-mananera",
+      "title": "Versión estenográfica. Conferencia de prensa de la presidenta Claudia Sheinbaum Pardo del 28 de octubre de 2024",
+      "sequence": 4,
+      "speaker_raw": "ARIADNA MONTIEL REYES",
+      "speaker_normalized": "Ariadna Montiel Reyes",
+      "role": null,
+      "text": " la reforma está pensada en atender a los más pobres. También se plantea el mismo apoyo para los pescadores de pequeña escala. Y se establece también, en el artículo 27, que el Estado mantendrá Precios de Garantía para el maíz, para el frijol, para el trigo panificable, para la leche y el arroz como productos básicos. Y todos estos programas se van a regular respecto a lo que la ley secundaria o en el caso de las reglas de operación que adquieren una vez publicadas el nivel de ley, de tal manera que esta reforma ha contemplado garantizar el derecho a los 30 millones de beneficiarios que hoy reciben un programa de Bienestar. Las becas de educación media superior ya están contenidas en el artículo 4º como un derecho para los jóvenes,de tal manera, que se ha ido avanzando. Y, también, la presidenta envió la propuesta para hacer un derecho la pensión para las mujeres que hoy estamos registrando y que es un nuevo programa. Es cuanto, presidenta. Buenos días.",
+      "token_count": 246,
+      "distance": 0.492603093826578
+    },
+    {
+      "doc_id": "2024-10-28-mananera",
+      "title": "Versión estenográfica. Conferencia de prensa de la presidenta Claudia Sheinbaum Pardo del 28 de octubre de 2024",
+      "sequence": 4,
+      "speaker_raw": "ARIADNA MONTIEL REYES",
+      "speaker_normalized": "Ariadna Montiel Reyes",
+      "role": null,
+      "text": " muy importante, se establece que el Estado va a garantizar cada año mayor presupuesto a estas pensiones, que por lo menos haya un incremento de la inflación para mantener el valor de la pensión de las pensiones. En el caso de la reforma al artículo 27, se estableció lo que es el programa Sembrando Vida, que al texto constitucional dice que es un jornal seguro, justo y permanente para los campesinos que cultiven sus tierras con árboles frutales, maderables y especies que requieren ser procesadas, que son productos agroindustriales como el café, como el cacao, como el achiote, de tal manera que este programa quede a nivel de la Constitución, Sembrando Vida, que ha dado muchos frutos y muy buenos resultados, hoy se convierte en un derecho para nuestras sembradoras, sembradores, campesinos, campesinas. También en la reforma al artículo 27 se define un apoyo no al directo para la entrega de fertilizantes gratuitos, para productores de pequeña escala. Esto es muy importante porque toda la reforma está pensada en atender a los más pobres. También se plantea el mismo apoyo para los pescadores de pequeña escala. Y se establece también, en el artículo 27, que el Estado",
+      "token_count": 300,
+      "distance": 0.497957647090235
+    },
+    {
+      "doc_id": "2024-10-22-mananera",
+      "title": "Versión estenográfica. Conferencia de prensa de la presidenta Claudia Sheinbaum Pardo del 22 de octubre de 2024",
+      "sequence": 3,
+      "speaker_raw": "JULIO ANTONIO BERDEGUÉ SACRISTÁN, SECRETARIO DE AGRICULTURA Y DESARROLLO RURAL",
+      "speaker_normalized": "Julio Antonio Berdegué Sacristán",
+      "role": "Secretario De Agricultura Y Desarrollo RURAL",
+      "text": " en el campo. En el gobierno del presidente Andrés Manuel López Obrador redujimos en 18 por ciento, más de 18 por ciento, en los primeros cuatro años de su gobierno la pobreza extrema por ingresos en el campo, eso realmente no se vio en otros países de la región, pero todavía tenemos bastante que hacer para lograr la meta de bajar a menos de dos por ciento de pobreza extrema en el país. Además, la presidenta nos ha encargado mucho poner una especial atención y dedicación a las personas jornaleras. Nos olvidamos de las personas jornaleras, son más de dos millones de personas que trabajan cosechando los campos y la comida que todos nosotros recibimos, y que se encuentran entre los más pobres y vulnerables de nuestra nación, particularmente las mujeres jornaleras. Se va a hacer un esfuerzo para garantizar sus derechos constitucionales a la salud, a la educación y a la vivienda, y quiero enfatizar con mucha fuerza que aquí le cabe también una responsabilidad al sector privado, sobre todo en los derechos laborales de estas personas. El segundo gran eje es la producción, tenemos que producir más. Lo central, lo principal, lo número uno es garantizar la autosuficiencia de maíz blanco no transgénico, que es el",
+      "token_count": 300,
+      "distance": 0.559793094415085
+    },
+    {
+      "doc_id": "2024-10-10-mananera",
+      "title": "Versión estenográfica. Conferencia de prensa de la presidenta Claudia Sheinbaum Pardo del 10 de octubre de 2024",
+      "sequence": 65,
+      "speaker_raw": "PRESIDENTA CLAUDIA SHEINBAUM PARDO",
+      "speaker_normalized": "Claudia Sheinbaum Pardo",
+      "role": "Presidenta",
+      "text": "No tenemos pensado mayores modificaciones hasta este momento, no lo tenemos pensado. Por supuesto, ejidos y comunidades, se les va a apoyar. Justo ayer tuve una —fíjense qué interesante— ayer tuve una reunión con Sedatu —Sedatu lleva la parte agraria— con la modificación a la reforma constitucional, que ahora al 2º constitucional que reconoce con derechos plenos y como sujetos de derecho a los pueblos originarios y a los afromexicanos, tenemos que abrir un nuevo esquema de propiedad, ¿verdad? Porque hasta ahora existe la propiedad agraria, social, la propiedad pública y la propiedad privada, pero si vamos a… Si algún pueblo originario tiene derecho a la propiedad, entonces tenemos que hacer una serie de leyes secundarias que den esta característica y, además, pues que no se sobreponga sobre otras propiedades. Es interesante el caso de lo que se aprobó. Por ejemplo, el regreso de la tierra al pueblo yaqui fue principalmente a comunidad agraria, a las comunidades; la mayor parte de Oaxaca, que es donde más pueblos originarios hay en México, es propiedad social comunal. Entonces, al hablar de reconocimiento de propiedad a un pueblo originario, tiene que quedar muy claro la parte agr",
+      "token_count": 300,
+      "distance": 0.565321931363167
+    },
+    {
+      "doc_id": "2024-10-01-conference",
+      "title": "Versión estenográfica. Toma de protesta ante el pueblo de México",
+      "sequence": 140,
+      "speaker_raw": "PRESIDENTA CLAUDIA SHEINBAUM PARDO",
+      "speaker_normalized": "Claudia Sheinbaum Pardo",
+      "role": "Presidenta",
+      "text": ". 60. Estoy segura que lo vamos a lograr. En acuerdo con las y los empleadores, iremos alcanzando paulatinamente en el sexenio la semana de 40 horas. 61. Tenemos el compromiso con los trabajadores de Altos Hornos de México de la región de Monclova, en Coahuila, de recuperar sus fuentes de trabajo. Continuaremos con el plan integral de rescate y justicia para los familiares de Pasta de Conchos y de El Pinabete. República rural justa y soberana: 62. La soberanía alimentaria seguirá siendo el eje rector de nuestra política para el campo. Garantizaremos la autosuficiencia del maíz blanco libre de transgénicos, desde la producción hasta el consumo. Aseguraremos el abasto de maíz para el consumo humano. El objetivo, además, es lograr un verdadero acuerdo entre productores de maíz y de tortilla, queremos llegar a un precio justo de la tortilla en nuestro país; y sin maíz...",
+      "token_count": 237,
+      "distance": 0.571096650231281
+    }
+  ]
+}

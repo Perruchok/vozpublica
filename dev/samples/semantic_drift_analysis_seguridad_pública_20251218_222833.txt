@@ -1,0 +1,43 @@
+Semantic Drift Analysis
+Concept: seguridad pública
+Analysis Date: 2025-12-18 22:28:33
+Pre-period: 2024-10-01 to 2025-07-01
+Post-period: 2025-08-01 to 2025-12-01
+
+================================================================================
+
+- **Core framing (pre vs post):**
+
+  - **Pre-period:**  
+    "Seguridad pública" is framed primarily as a matter of **institutional coordination, professionalization, and systemic strengthening**. The excerpts emphasize "coordinación absoluta entre las instituciones," "mecanismos permanentes de colaboración activa," and the creation or modification of **institutional frameworks** (e.g., "modificación al artículo 21," "creación... de las Unidades de Investigación del Delito"). The focus is on **building capacity**, improving **investigation and intelligence**, and **professionalizing police forces** ("instituciones más sólidas y profesionales"). There is also a strong emphasis on **fiscal transparency and efficiency** ("criterios claros y transparentes para el uso de los recursos federales," "mayor eficiencia presupuestal").
+
+  - **Post-period:**  
+    The framing shifts toward **security as an integral, human-centered service** with a **community and citizen focus**. The language foregrounds "seguridad integral con enfoque humano," "garantizar la paz, la justicia y la tranquilidad de las familias mexicanas," and "fortalecimiento de las Policías estatales y municipales... primera línea de contacto con la ciudadanía." The emphasis is on **direct service to citizens**, the **immediacy of police response**, and the **practical impact on everyday life** ("acompañan al comerciante que teme por su negocio," "auxilio inmediato al ciudadano que es víctima de un delito"). There is also a new focus on **professionalization through a national academy** and **long-term sustainability** ("Academia Nacional de Seguridad Pública," "mandatos de esas leyes sean una realidad... de largo plazo").
+
+---
+
+- **Concepts that gained prominence:**
+
+  - **Human-centered and community focus:**  
+    Phrases like "seguridad integral con enfoque humano," "tranquilidad de las familias mexicanas," and the detailed description of police as "primera línea de contacto con la ciudadanía" highlight a shift toward **citizen experience and well-being**.
+  - **Local police empowerment:**  
+    The post-period repeatedly stresses the **centrality of state and municipal police** ("fortalecimiento de las Policías estatales y municipales," "acuden de inmediato al llamado de una emergencia").
+  - **Long-term vision and professionalization:**  
+    The creation of the "Academia Nacional de Seguridad Pública" and the call for "homologación profesional" indicate a new emphasis on **standardized, long-term professional development**.
+
+---
+
+- **Concepts that lost prominence:**
+
+  - **Institutional and bureaucratic mechanisms:**  
+    The pre-period's focus on "modificación al artículo 21," "consolidar el Sistema Nacional de Inteligencia," and "rendición de cuentas" is less visible in the post-period.
+  - **Fiscal and procedural transparency:**  
+    The detailed attention to "criterios claros y transparentes para el uso de los recursos federales," "mayor eficiencia presupuestal," and "prevención a la corrupción" is not foregrounded in the post-period excerpts.
+  - **Macro-level coordination:**  
+    While "coordinación" remains, the **emphasis shifts from high-level institutional coordination** to **practical, on-the-ground collaboration** and **direct service**.
+
+---
+
+- **Overall semantic shift (grounded in text):**
+
+  The

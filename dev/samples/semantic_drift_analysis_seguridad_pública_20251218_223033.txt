@@ -1,0 +1,46 @@
+Semantic Drift Analysis
+Concept: seguridad pública
+Analysis Date: 2025-12-18 22:30:33
+Pre-period: 2024-10-01 to 2025-07-01
+Post-period: 2025-08-01 to 2025-12-01
+
+================================================================================
+
+- **Core framing (pre vs post)**
+
+  - **Pre-period:** "Seguridad pública" is framed primarily as a matter of **institutional coordination, professionalization, and system-building**. There is a strong emphasis on "coordinación absoluta entre las instituciones", "mecanismos permanentes de colaboración activa", and "fortalecer las capacidades de prevención y proximidad social de las policías locales". The focus is on **building durable systems** (e.g., "consolidar el Sistema Nacional de Inteligencia", "creación, operación, fortalecimiento y certificación de las Unidades de Investigación del Delito"), **legal reforms** ("modificación al artículo 21"), and **resource management** ("criterios claros y transparentes para el uso de los recursos federales", "mayor eficiencia presupuestal"). The overarching frame is **institutional strengthening and intergovernmental collaboration** to reduce crime and improve public safety.
+
+  - **Post-period:** The framing shifts to "seguridad integral con enfoque humano", with an explicit **orientation toward the well-being of families and communities** ("garantizar la paz, la justicia y la tranquilidad de las familias mexicanas"). There is a new emphasis on **human-centered outcomes** and **community-level engagement** ("Policías estatales y municipales... primera línea de contacto con la ciudadanía", "acompañan al comerciante", "auxilio inmediato al ciudadano"). The language foregrounds **trust-building** ("fortalecer la confianza ciudadana en nuestras instituciones") and **professionalization at the local level** ("Academia Nacional de Seguridad Pública", "homologación profesional en todo el país"). The frame moves from system-building to **direct service, responsiveness, and citizen trust**.
+
+---
+
+- **Concepts that gained prominence**
+
+  - **Human-centered and community-oriented language:** "seguridad integral con enfoque humano", "tranquilidad de las familias mexicanas", "confianza ciudadana", "acompañan al comerciante", "auxilio inmediato al ciudadano".
+  - **Local police empowerment:** "fortalecimiento de las Policías estatales y municipales", "primera línea de contacto con la ciudadanía", "Academia Nacional de Seguridad Pública".
+  - **Long-term and sustainable impact:** "acuerdos sólidos", "resultados tangibles y perdurables", "beneficio de la ciudadanía y que sean de largo plazo".
+
+---
+
+- **Concepts that lost prominence**
+
+  - **Macro-level institutional coordination:** While still present, phrases like "coordinación absoluta entre las instituciones", "Gabinete de Seguridad", and "mecanismos permanentes de colaboración activa" are less foregrounded.
+  - **Technical and legal reforms:** References to "modificación al artículo 21", "Sistema Nacional de Inteligencia", "Unidades de Investigación del Delito", and "criterios claros y transparentes para el uso de los recursos federales" recede in the post-period.
+  - **Resource management and anti-corruption:** The earlier focus on "eficiencia presupuestal", "prevención a la corrupción", and "rendición de cuentas" is less prominent.
+
+---
+
+- **Overall semantic shift (grounded in text)**
+
+  The semantic drift score of 0.56 is plausibly accounted for by a 
+  **shift from an institutional, system-building, and resource-focused framing** 
+  ("coordinación absoluta", "fortalecer capacidades", "consolidar el Sistema Nacional de Inteligencia",
+   "criterios claros y transparentes", "prevención a la corrupción") 
+  **to a more human-centered, community-responsive, and trust-oriented framing**
+   ("seguridad integral con enfoque humano", "confianza ciudadana", "tranquilidad de las familias mexicanas", 
+   "Policías estatales y municipales... primera línea de contacto"). 
+  The **scope narrows from national systems and legal frameworks to local police and direct citizen interaction**,
+   and the **emphasis moves from building structures to delivering tangible,
+    immediate benefits to individuals and communities**. 
+    This reorientation in emphasis, scope, and framing is reflected in the concrete textual 
+    evidence and accounts for the measured semantic drift.
