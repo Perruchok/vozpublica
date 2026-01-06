@@ -5,16 +5,10 @@ from pydantic import BaseModel
 import os
 import openai
 from openai import OpenAI
-from postprocessing_helpers import embed_text
-import asyncpg
+from utils.postprocessing_helpers import embed_text
+from utils.dbpool import get_pool
 
-# Database connection
-pg_host = os.environ["PGHOST"]
-pg_user = os.environ["PGUSER"]
-pg_password = os.environ["PGPASSWORD"]
-pg_db = os.environ["PGDATABASE"]
-pg_port = os.environ.get("PGPORT", "5432")
-DATABASE_URL = f"postgresql://{pg_user}:{pg_password}@{pg_host}:{pg_port}/{pg_db}?sslmode=require"
+
 # LLM Client
 # Embedding model settings from environment variables
 azure_openai_endpoint = os.environ["AZURE_OPENAI_ENDPOINT"]
@@ -29,23 +23,7 @@ app = FastAPI(title="VozPublica RAG API", version="0.1.0")
 class Query(BaseModel):
     question: str
 
-@app.get("/")
-async def root():
-    return FileResponse("app/static/index.html")   
-    #return {"message": "VozPublica RAG API is running."}
 
-# Database connection pool 
-pool = None
-async def get_pool():
-    global pool
-    if pool is None:
-        pool = await asyncpg.create_pool(
-            DATABASE_URL,
-            min_size=1,
-            max_size=10,
-            command_timeout=60
-        )
-    return pool
 
 @app.post("/semantic_search")
 async def semantic_search(query: Query):
@@ -178,7 +156,11 @@ async def question_answer(query: Query):
     }
 
 
-
 @app.get("/health")
 async def health():
     return {"status": "ok"}
+
+@app.get("/")
+async def root():
+    return FileResponse("app/static/index.html")   
+    #return {"message": "VozPublica RAG API is running."}

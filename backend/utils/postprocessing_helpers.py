@@ -10,10 +10,14 @@ import time
 import psycopg2
 from psycopg2.extras import Json
 # Import normalized speaker helpers from shared module
-from text_utils import parse_speaker_raw
+from backend.utils.text_utils import parse_speaker_raw
 import os
 from openai import AzureOpenAI
 import tiktoken
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 
 # Database settings from environment variables
 pg_host = os.environ["PGHOST"]
@@ -25,6 +29,7 @@ pg_port = os.environ.get("PGPORT", "5432")
 azure_openai_endpoint = os.environ["AZURE_OPENAI_ENDPOINT"]
 azure_openai_api_key = os.environ["AZURE_OPENAI_API_KEY"]
 azure_openai_api_version = os.environ.get("AZURE_OPENAI_API_VERSION", "2024-12-01-preview")
+azure_openai_embedding_deployment = os.environ.get("AZURE_OPENAI_EMBEDDING_DEPLOYMENT", "text-embedding-3-small")
 
 
 client = AzureOpenAI(
@@ -238,7 +243,7 @@ def embed_text(text: str): # Embedding
     Returns a vector (list of floats).
     """
     response = client.embeddings.create(
-        model="text-embedding-3-small", 
+        model=azure_openai_embedding_deployment, 
         input=text
     )
 
