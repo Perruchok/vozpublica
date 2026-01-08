@@ -28,13 +28,16 @@ async def answer_question(question: str, top_k: int):
 
     sql = """
     SELECT
-      doc_id,
-      sequence,
-      speaker_raw,
-      text,
-      1 - (embedding <=> $1::vector) AS similarity
-    FROM speech_turns
-    ORDER BY embedding <=> $1::vector
+      st.doc_id,
+      st.sequence,
+      st.speaker_raw,
+      st.text,
+      rtm.title,
+      rtm.href,
+      1 - (st.embedding <=> $1::vector) AS similarity
+    FROM speech_turns st
+    LEFT JOIN raw_transcripts_meta rtm ON st.doc_id = rtm.doc_id
+    ORDER BY st.embedding <=> $1::vector
     LIMIT $2;
     """
 
@@ -44,11 +47,17 @@ async def answer_question(question: str, top_k: int):
     if not rows:
         return None
 
-    # 3️⃣ Build context for RAG
-    context = "\n\n".join(
-        f"[{r['doc_id']} | {r['speaker_raw']}]\n{r['text']}"
-        for r in rows
-    )
+    # 3️⃣ Build context for RAG with markdown links
+    context_lines = []
+    for i, r in enumerate(rows, 1):
+        # Format with markdown link reference: [doc_id](href)
+        ref = f"[{r['doc_id']}]({r['href']})" if r.get('href') else r['doc_id']
+        context_lines.append(
+            f"[Ref {i}: {ref}]\n"
+            f"[{r['speaker_raw']}]\n"
+            f"{r['text']}"
+        )
+    context = "\n\n".join(context_lines)
 
     # 4️⃣ Call LLM
     client = AzureOpenAI(
@@ -65,9 +74,9 @@ async def answer_question(question: str, top_k: int):
                 "content": (
                     "You are an assistant that answers questions using ONLY the provided context. "
                     "If the answer is not contained in the context, say you don't know. "
-                    "Cite the source when relevant."
-                    #"If provided context is enough, provide detailed answer."
-
+                    "IMPORTANT: When citing information, include the reference links in markdown format: [Ref 1](url). "
+                    "This allows readers to verify the sources. "
+                    "Example: 'Según la presidenta [Ref 1](https://example.com/doc1), la política de seguridad...'"
                 )
             },
             {
@@ -81,10 +90,6 @@ async def answer_question(question: str, top_k: int):
         ],
         max_tokens=600,
         temperature=0.2
-        # TODO: consider adding these parameters later
-        # top_p=1.0,
-        # frequency_penalty=0.0,
-        # presence_penalty=0.0
     )
 
     answer = response.choices[0].message.content

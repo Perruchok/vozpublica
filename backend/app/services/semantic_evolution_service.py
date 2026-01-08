@@ -57,17 +57,20 @@ async def compute_semantic_evolution(
       rtm.published_at IS NOT NULL
       AND rtm.published_at >= $2
       AND rtm.published_at <= $3
-      AND 1 - (st.embedding <=> $1::vector) > $4
-    ORDER BY period;
+      AND (st.embedding <=> $1::vector) < $4  -- Use distance operator for better index usage
+    ORDER BY similarity DESC
+    LIMIT 10000;  -- Limit results to prevent extremely long queries
     """
     
     async with pool.acquire() as conn:
+        # Convert similarity threshold to distance (1 - similarity)
+        distance_threshold = 1 - similarity_threshold
         rows = await conn.fetch(
             sql,
             embedding_str,
             start_date,
             end_date,
-            similarity_threshold
+            distance_threshold
         )
     
     if not rows:

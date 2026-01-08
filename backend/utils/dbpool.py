@@ -19,6 +19,6 @@ async def get_pool():
             DATABASE_URL,
             min_size=1,
             max_size=10,
-            command_timeout=60
+            command_timeout=180  # Increased timeout for complex vector queries
         )
     return pool

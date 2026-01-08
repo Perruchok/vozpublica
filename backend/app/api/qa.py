@@ -20,7 +20,9 @@ async def question_answer(req: QuestionRequest):
             {
                 "doc_id": r["doc_id"],
                 "sequence": r["sequence"],
-                "similarity": float(r["similarity"])
+                "similarity": float(r["similarity"]),
+                "title": r.get("title"),
+                "href": r.get("href")
             }
             for r in rows
         ]

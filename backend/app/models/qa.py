@@ -9,6 +9,8 @@ class Source(BaseModel):
     doc_id: str
     sequence: int | None
     similarity: float
+    title: str | None = None
+    href: str | None = None
 
 class QuestionResponse(BaseModel):
     question: str
