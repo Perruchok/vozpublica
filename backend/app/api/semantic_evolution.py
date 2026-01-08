@@ -19,6 +19,9 @@ async def semantic_evolution(req: SemanticEvolutionRequest):
         - Maximum drift point
     """
     try:
+        print(f"[semantic_evolution] Request: concept='{req.concept}', granularity={req.granularity}, "
+              f"start_date={req.start_date}, end_date={req.end_date}, threshold={req.similarity_threshold}")
+        
         result = await compute_semantic_evolution(
             concept=req.concept,
             granularity=req.granularity,
@@ -27,7 +30,13 @@ async def semantic_evolution(req: SemanticEvolutionRequest):
             similarity_threshold=req.similarity_threshold
         )
         
+        print(f"[semantic_evolution] Result: {len(result.get('drift', []))} drift points, "
+              f"{len(result.get('points', []))} evolution points")
+        
         return result
         
     except Exception as e:
+        print(f"[semantic_evolution] Error: {str(e)}")
+        import traceback
+        traceback.print_exc()
         raise HTTPException(status_code=500, detail=f"Error computing semantic evolution: {str(e)}")

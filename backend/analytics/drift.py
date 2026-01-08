@@ -124,6 +124,7 @@ def explain_semantic_drift_with_llm(
         "You MUST rely ONLY on the provided excerpts.\n"
         "Do NOT speculate beyond the text.\n"
         "Cite specific phrases or patterns when making claims.\n"
+        "IMPORTANT: Respond in SPANISH unless the concept being analyzed is in English.\n"
         "Respond in JSON format."
     )
 

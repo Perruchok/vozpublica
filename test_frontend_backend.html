@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Frontend-Backend Connection</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+        }
+        .result {
+            background: #f4f4f4;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+        .error {
+            background: #ffebee;
+            color: #c62828;
+        }
+        .success {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+        button {
+            background: #2196F3;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+        button:hover {
+            background: #1976D2;
+        }
+    </style>
+</head>
+<body>
+    <h1>Test Frontend-Backend Connection</h1>
+    
+    <button onclick="testConnection()">Test Semantic Evolution API</button>
+    
+    <div id="results"></div>
+
+    <script>
+        const API_BASE_URL = 'http://localhost:8000';
+        
+        async function testConnection() {
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = '<div class="result">Testing connection...</div>';
+            
+            try {
+                console.log('[TEST] Starting API test...');
+                
+                const payload = {
+                    concept: "seguridad en michoacán",
+                    granularity: "month",
+                    start_date: "2024-01-01",
+                    end_date: "2024-12-31",
+                    similarity_threshold: 0.6
+                };
+                
+                console.log('[TEST] Payload:', payload);
+                
+                const response = await fetch(`${API_BASE_URL}/api/semantic-evolution`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(payload)
+                });
+                
+                console.log('[TEST] Response status:', response.status);
+                console.log('[TEST] Response headers:', [...response.headers.entries()]);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                console.log('[TEST] Response data:', data);
+                
+                resultsDiv.innerHTML = `
+                    <div class="result success">
+                        <strong>✅ Success!</strong><br>
+                        Status: ${response.status}<br>
+                        Data: ${JSON.stringify(data, null, 2)}
+                    </div>
+                `;
+                
+            } catch (error) {
+                console.error('[TEST] Error:', error);
+                resultsDiv.innerHTML = `
+                    <div class="result error">
+                        <strong>❌ Error!</strong><br>
+                        ${error.message}
+                    </div>
+                `;
+            }
+        }
+    </script>
+</body>
+</html>
