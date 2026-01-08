@@ -1,4 +1,5 @@
 import '@/styles/globals.css';
+import { LanguageProvider } from '@/lib/languageContext';
 
 export const metadata = {
   title: 'VozPública',
@@ -8,7 +9,11 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="es">
-      <body>{children}</body>
+      <body>
+        <LanguageProvider>
+          {children}
+        </LanguageProvider>
+      </body>
     </html>
   );
 }

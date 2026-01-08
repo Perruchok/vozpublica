@@ -1,14 +1,17 @@
 "use client";
 
 import { useState } from "react";
+import { useLanguage } from '@/lib/languageContext';
+import LanguageToggle from '@/components/common/LanguageToggle';
 import ConceptForm from "./ConceptForm";
 import EvolutionChart from "./EvolutionChart";
 import ChangeExplanation from "./ChangeExplanation";
-import LoadingSpinner from "@/components/common/LoadingSpinner";
 import ErrorBox from "@/components/common/ErrorBox";
 import { fetchSemanticEvolution, fetchDriftExplanation } from "@/lib/api";
+import Link from 'next/link';
 
 export default function NarrativeEvolutionPage() {
+  const { t, translations } = useLanguage();
   const [concept, setConcept] = useState("");
   const [granularity, setGranularity] = useState("month");
   const [evolutionData, setEvolutionData] = useState(null);
@@ -32,7 +35,7 @@ export default function NarrativeEvolutionPage() {
   // Validate date range
   const validateDateRange = (start, end) => {
     if (new Date(end) < new Date(start)) {
-      return 'La fecha final no puede ser anterior a la fecha inicial';
+      return t('narrative.dateRangeError');
     }
     return null;
   };
@@ -54,7 +57,7 @@ export default function NarrativeEvolutionPage() {
 
   async function runAnalysis() {
     if (!concept.trim()) {
-      setError("Por favor ingresa un concepto para analizar");
+      setError(t('narrative.errorEmptyConcept'));
       return;
     }
     
@@ -84,13 +87,21 @@ export default function NarrativeEvolutionPage() {
       console.log('[NarrativeEvolution] Received data:', data);
       
       if (!data.drift || data.drift.length === 0) {
-        setError("No se encontraron datos suficientes para este concepto. Intenta con otro término o ajusta el umbral de similitud.");
+        setError(t('narrative.errorNoData'));
       } else {
         setEvolutionData(data);
       }
     } catch (err) {
       console.error('[NarrativeEvolution] Error:', err);
-      setError(err.message || "Error al obtener los datos de evolución");
+      
+      // Handle timeout errors specifically
+      if (err.message.includes('timeout') || err.message.includes('504')) {
+        setError(t('narrative.errorTimeout'));
+      } else if (err.message.includes('503')) {
+        setError(t('narrative.errorServiceUnavailable'));
+      } else {
+        setError(err.message || t('narrative.errorFetchingData'));
+      }
     } finally {
       setLoading(false);
     }
@@ -111,7 +122,7 @@ export default function NarrativeEvolutionPage() {
       setSelectedChange(data);
     } catch (err) {
       console.error('[NarrativeEvolution] Error fetching explanation:', err);
-      setExplanationError(err.message || "Error al generar la explicación");
+      setExplanationError(err.message || t('narrative.errorExplanation'));
     } finally {
       setLoadingExplanation(false);
     }
@@ -120,10 +131,12 @@ export default function NarrativeEvolutionPage() {
   return (
     <div className="page narrative-evolution-page">
       <header className="page-header">
-        <h1>Evolución Narrativa</h1>
-        <p className="subtitle">
-          Analiza cómo cambia el significado de conceptos políticos a través del tiempo
-        </p>
+        <div className="page-header-top">
+          <h1>📊 {t('narrative.title')}</h1>
+          <LanguageToggle />
+        </div>
+        <p className="subtitle">{t('narrative.subtitle')}</p>
+        <Link href="/" className="back-link">← {t('narrative.backToHome')}</Link>
       </header>
 
       <ConceptForm
@@ -144,7 +157,10 @@ export default function NarrativeEvolutionPage() {
       {error && <ErrorBox message={error} onDismiss={() => setError(null)} />}
 
       {loading && (
-        <LoadingSpinner message="Analizando evolución semántica..." />
+        <div className="narrative-loading">
+          <div className="loading-spinner"></div>
+          <p>{t('narrative.analyzingEvolution')}</p>
+        </div>
       )}
 
       {evolutionData && !loading && (
@@ -157,8 +173,9 @@ export default function NarrativeEvolutionPage() {
           />
           
           {loadingExplanation && (
-            <div style={{ marginTop: '20px' }}>
-              <LoadingSpinner message="Generando explicación con IA..." />
+            <div className="narrative-loading" style={{ marginTop: '20px' }}>
+              <div className="loading-spinner"></div>
+              <p>{t('narrative.generatingExplanation')}</p>
             </div>
           )}
 

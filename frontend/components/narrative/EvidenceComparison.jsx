@@ -1,17 +1,22 @@
 "use client";
 
+import { useLanguage } from '@/lib/languageContext';
+
 export default function EvidenceComparison({ before, after }) {
+  const { t, language } = useLanguage();
+  
   if (!before || !after || before.length === 0 || after.length === 0) {
     return (
       <div className="evidence-comparison empty">
-        <p>No hay suficiente evidencia textual para comparar</p>
+        <p>{t('narrative.evidence.noData')}</p>
       </div>
     );
   }
 
   const formatDate = (date) => {
     if (!date) return "";
-    return new Date(date).toLocaleDateString('es-MX', {
+    const locale = language === 'en' ? 'en-US' : 'es-MX';
+    return new Date(date).toLocaleDateString(locale, {
       day: 'numeric',
       month: 'short',
       year: 'numeric'
@@ -35,14 +40,14 @@ export default function EvidenceComparison({ before, after }) {
 
   return (
     <div className="evidence-comparison">
-      <h3>📝 Evidencia Textual</h3>
+      <h3>📝 {t('narrative.evidence.title')}</h3>
       <p className="section-description">
-        Fragmentos de discursos que ejemplifican el uso del concepto en cada período
+        {t('narrative.evidence.description')}
       </p>
       
       <div className="evidence-grid">
         <div className="evidence-column">
-          <h4 className="column-header before">Antes</h4>
+          <h4 className="column-header before">{t('narrative.evidence.before')}</h4>
           <div className="evidence-list">
             {before.map((item, idx) => (
               <EvidenceCard key={idx} item={item} />
@@ -56,7 +61,7 @@ export default function EvidenceComparison({ before, after }) {
         </div>
 
         <div className="evidence-column">
-          <h4 className="column-header after">Después</h4>
+          <h4 className="column-header after">{t('narrative.evidence.after')}</h4>
           <div className="evidence-list">
             {after.map((item, idx) => (
               <EvidenceCard key={idx} item={item} />
@@ -67,7 +72,7 @@ export default function EvidenceComparison({ before, after }) {
 
       <div className="evidence-footer">
         <p className="disclaimer">
-          💡 Esta evidencia ha sido seleccionada automáticamente por su alta similitud semántica con el concepto analizado.
+          💡 {t('narrative.evidence.disclaimer')}
         </p>
       </div>
     </div>

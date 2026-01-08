@@ -1,15 +1,17 @@
 "use client";
 
 import { useState } from "react";
+import { useLanguage } from '@/lib/languageContext';
 
 export default function EvolutionChart({ concept, points, onSelectChange, disabled = false }) {
+  const { t } = useLanguage();
   const [selectedIndex, setSelectedIndex] = useState(null);
   const [hoveredIndex, setHoveredIndex] = useState(null);
 
   if (!points || points.length === 0) {
     return (
       <div className="evolution-chart empty">
-        <p>No hay datos suficientes para mostrar la evolución</p>
+        <p>{t('narrative.chart.noData')}</p>
       </div>
     );
   }
@@ -79,7 +81,7 @@ export default function EvolutionChart({ concept, points, onSelectChange, disabl
 
   return (
     <div className="evolution-chart">
-      <h2>Evolución Semántica: "{concept}"</h2>
+      <h2>{t('narrative.chart.title')}: "{concept}"</h2>
       
       <div className="chart-container" style={{ 
         display: 'flex', 
@@ -152,24 +154,24 @@ export default function EvolutionChart({ concept, points, onSelectChange, disabl
             x={15}
             y={height / 2}
             transform={`rotate(-90, 15, ${height / 2})`}
-            fontSize="14"
+            fontSize="16"
             fontWeight="600"
             fill="#555"
             textAnchor="middle"
           >
-            Cambio Semántico
+            {t('narrative.chart.yAxisLabel')}
           </text>
           
           {/* X-axis label */}
           <text
             x={width / 2}
             y={height - 15}
-            fontSize="14"
+            fontSize="16"
             fontWeight="600"
             fill="#555"
             textAnchor="middle"
           >
-            Período
+            {t('narrative.chart.xAxisLabel')}
           </text>
           
           {/* Y-axis ticks */}
@@ -189,7 +191,7 @@ export default function EvolutionChart({ concept, points, onSelectChange, disabl
                 <text
                   x={padding.left - 12}
                   y={y + 4}
-                  fontSize="12"
+                  fontSize="14"
                   fill="#555"
                   textAnchor="end"
                   fontWeight="500"
@@ -283,7 +285,7 @@ export default function EvolutionChart({ concept, points, onSelectChange, disabl
                       fill="white"
                       fontWeight="500"
                     >
-                      De: {formatPeriod(point.from)}
+                      {t('narrative.chart.tooltipFrom')}: {formatPeriod(point.from)}
                     </text>
                     <text 
                       x={x > chartWidth / 2 ? x - 155 : x + 20} 
@@ -292,7 +294,7 @@ export default function EvolutionChart({ concept, points, onSelectChange, disabl
                       fill="white"
                       fontWeight="500"
                     >
-                      A: {formatPeriod(point.to)}
+                      {t('narrative.chart.tooltipTo')}: {formatPeriod(point.to)}
                     </text>
                     <text 
                       x={x > chartWidth / 2 ? x - 155 : x + 20} 
@@ -301,7 +303,7 @@ export default function EvolutionChart({ concept, points, onSelectChange, disabl
                       fill="#ffd700" 
                       fontWeight="bold"
                     >
-                      Cambio: {point.semantic_change.toFixed(3)}
+                      {t('narrative.chart.tooltipChange')}: {point.semantic_change.toFixed(3)}
                     </text>
                   </g>
                 )}
@@ -310,14 +312,14 @@ export default function EvolutionChart({ concept, points, onSelectChange, disabl
                 {(idx % Math.max(1, Math.floor(points.length / 5)) === 0 || idx === points.length - 1) && (
                   <text
                     x={x}
-                    y={height - padding.bottom + 20}
-                    fontSize="10"
+                    y={height - padding.bottom + 15}
+                    fontSize="13"
                     fill="#555"
                     textAnchor="middle"
-                    transform={`rotate(-35, ${x}, ${height - padding.bottom + 20})`}
                     fontWeight="500"
                   >
-                    {formatPeriod(point.to).substring(0, 7)}
+                    <tspan x={x} dy="0">{formatPeriod(point.from).substring(0, 7)} →</tspan>
+                    <tspan x={x} dy="14">{formatPeriod(point.to).substring(0, 7)}</tspan>
                   </text>
                 )}
               </g>
@@ -328,29 +330,29 @@ export default function EvolutionChart({ concept, points, onSelectChange, disabl
 
       <div className="chart-legend">
         <p className="hint">
-          📊 Haz clic en cualquier punto del gráfico o en el botón "Explicar" para ver la explicación del cambio semántico
+          {t('narrative.chart.hint')}
         </p>
         <div className="legend-items">
           <span className="legend-item">
-            <span className="dot" style={{ backgroundColor: '#4caf50' }}></span> Cambio bajo (&lt; 0.1)
+            <span className="dot" style={{ backgroundColor: '#4caf50' }}></span> {t('narrative.chart.legendLow')}
           </span>
           <span className="legend-item">
-            <span className="dot" style={{ backgroundColor: '#ff9800' }}></span> Cambio medio (0.1 - 0.3)
+            <span className="dot" style={{ backgroundColor: '#ff9800' }}></span> {t('narrative.chart.legendMedium')}
           </span>
           <span className="legend-item">
-            <span className="dot" style={{ backgroundColor: '#f44336' }}></span> Cambio alto (&gt; 0.3)
+            <span className="dot" style={{ backgroundColor: '#f44336' }}></span> {t('narrative.chart.legendHigh')}
           </span>
         </div>
       </div>
 
       <div className="data-table" style={{ overflowX: 'auto' }}>
-        <h3>Cambios Semánticos</h3>
+        <h3>{t('narrative.chart.tableTitle')}</h3>
         <table style={{ width: '100%', minWidth: '500px' }}>
           <thead>
             <tr>
-              <th>Período</th>
-              <th>Cambio Semántico</th>
-              <th>Acción</th>
+              <th>{t('narrative.chart.tablePeriod')}</th>
+              <th>{t('narrative.chart.tableChange')}</th>
+              <th>{t('narrative.chart.tableAction')}</th>
             </tr>
           </thead>
           <tbody>
@@ -404,7 +406,7 @@ export default function EvolutionChart({ concept, points, onSelectChange, disabl
                     onMouseOver={(e) => !disabled && (e.target.style.backgroundColor = '#1976d2')}
                     onMouseOut={(e) => !disabled && (e.target.style.backgroundColor = '#2196f3')}
                   >
-                    {disabled && selectedIndex === idx ? 'Cargando...' : 'Explicar'}
+                    {disabled && selectedIndex === idx ? t('narrative.chart.loadingButton') : t('narrative.chart.explainButton')}
                   </button>
                 </td>
               </tr>

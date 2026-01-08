@@ -1,193 +1,148 @@
+'use client';
+
 import Link from 'next/link';
+import { useLanguage } from '@/lib/languageContext';
+import LanguageToggle from '@/components/common/LanguageToggle';
 
 export default function Home() {
+  const { t, tf, translations } = useLanguage();
+
   return (
     <div className="landing-page">
       <header>
-        <h1>VozPública</h1>
-          <p className="tagline">Plataforma de Análisis y Consulta de Discurso Político con IA</p>
+        <div className="header-content">
+          <h1>VozPública</h1>
+          <p className="tagline">{t('tagline')}</p>
+        </div>
+        <LanguageToggle />
       </header>
 
       <main>
         {/* Hero Section */}
         <section className="hero">
-          {/* <h2>Análisis Profesional del Discurso Presidencial Mexicano</h2> */}
-          <p>
-            VozPública es una plataforma avanzada de análisis computacional del discurso político que emplea 
-            inteligencia artificial y procesamiento de lenguaje natural para extraer insights de las 
-            comunicaciones oficiales de la Presidencia de México.
-          </p>
-
+          <p>{t('hero.description')}</p>
         </section>
 
         {/* AI Services */}
         <section className="services">
-          <h2>Servicios de IA Disponibles</h2>
+          <h2>{t('services.title')}</h2>
           <div className="services-grid">
             <div className="service-card active">
-              <h3>🔍 Búsqueda Semántica</h3>
-              <p>
-Encuentra fragmentos del discurso presidencial por significado, no solo por coincidencia de palabras.              </p>
+              <h3>🔍 {t('services.search.title')}</h3>
+              <p>{t('services.search.description')}</p>
               <Link href="/search" className="cta-button">
-                Explorar Búsqueda
+                {t('services.search.cta')}
               </Link>
             </div>
             <div className="service-card active">
-              <h3>💬 Pregunta y Respuesta (LLM)</h3>
-              <p>
-                Formula preguntas en lenguaje natural sobre el contenido de los discursos.<br />
-                Respuestas generadas por IA basadas en el corpus presidencial.
-              </p>
+              <h3>💬 {t('services.qa.title')}</h3>
+              <p>{t('services.qa.description')}</p>
               <Link href="/qa" className="cta-button">
-                Hacer Preguntas
+                {t('services.qa.cta')}
               </Link>
             </div>
 
             <div className="service-card active">
-              <h3>📊 Evolución Narrativa</h3>
-              <p>
-                Analiza cómo conceptos políticos específicos cambian su significado semántico 
-                a través del tiempo. Detecta drift conceptual y cambios de contexto.
-              </p>
+              <h3>📊 {t('services.narrative.title')}</h3>
+              <p>{t('services.narrative.description')}</p>
               <Link href="/narrative" className="cta-button">
-                Ver Evolución
+                {t('services.narrative.cta')}
               </Link>
             </div>
 
             <div className="service-card upcoming">
-              <h3>🎯 Descubrimiento Automático de Tópicos</h3>
-              <p>
-                Identificación no supervisada de temas dominantes en el discurso presidencial 
-                usando clustering semántico y modelado de tópicos.
-              </p>
-              <span className="coming-soon">Próximamente</span>
+              <h3>🎯 {t('services.topics.title')}</h3>
+              <p>{t('services.topics.description')}</p>
+              <span className="coming-soon">{t('services.topics.comingSoon')}</span>
             </div>
           </div>
-            <p className="data-source">
-            <strong>Fuente de datos:</strong> Discursos presidenciales oficiales, conferencias de prensa, 
-            entrevistas y comunicados de <a href="https://www.gob.mx/presidencia" target="_blank" rel="noopener noreferrer">gob.mx/presidencia</a>
+          <p className="data-source">
+            <strong>{t('hero.dataSource')}</strong> {t('hero.dataSourceText')} <a href="https://www.gob.mx/presidencia" target="_blank" rel="noopener noreferrer">gob.mx/presidencia</a>
             <br />
-            <strong>Cobertura:</strong> Octubre 2024 en adelante (Administración Claudia Sheinbaum)
+            <strong>{t('hero.coverage')}</strong> {t('hero.coverageText')}
           </p>
         </section>
 
         {/* Value Proposition */}
         <section className="value-proposition">
-          <h2>¿Para quién es VozPública?</h2>
+          <h2>{t('valueProposition.title')}</h2>
           <div className="value-grid">
             <div className="value-item">
               <div className="value-icon">📊</div>
-              <h3>Para Analistas Políticos</h3>
-              <p>
-                Identifica cambios en prioridades gubernamentales, evolución de narrativas y patrones 
-                discursivos con precisión cuantitativa.
-              </p>
+              <h3>{t('valueProposition.analysts.title')}</h3>
+              <p>{t('valueProposition.analysts.description')}</p>
             </div>
             <div className="value-item">
               <div className="value-icon">📰</div>
-              <h3>Para Periodistas e Investigadores</h3>
-              <p>
-                Busca declaraciones específicas, verifica contextos históricos y encuentra contradicciones 
-                o consistencias en el discurso oficial.
-              </p>
+              <h3>{t('valueProposition.journalists.title')}</h3>
+              <p>{t('valueProposition.journalists.description')}</p>
             </div>
             <div className="value-item">
               <div className="value-icon">👥</div>
-              <h3>Para Ciudadanos Informados</h3>
-              <p>
-                Accede a análisis basados en datos sobre cómo el gobierno comunica sus políticas y 
-                comprende la evolución del discurso público.
-              </p>
+              <h3>{t('valueProposition.citizens.title')}</h3>
+              <p>{t('valueProposition.citizens.description')}</p>
             </div>
             <div className="value-item">
               <div className="value-icon">🎓</div>
-              <h3>Para Académicos</h3>
-              <p>
-                Utiliza herramientas de análisis semántico avanzado para investigación en ciencias 
-                políticas, comunicación y lingüística computacional.
-              </p>
+              <h3>{t('valueProposition.academics.title')}</h3>
+              <p>{t('valueProposition.academics.description')}</p>
             </div>
           </div>
         </section>
 
         {/* How it Works */}
         <section className="how-it-works">
-          <h2>Arquitectura y flujo de análisis</h2>
-
-          <p className="section-intro">
-            VozPública está diseñada como una plataforma modular de análisis semántico,
-            capaz de procesar grandes volúmenes de discurso político y convertirlos en
-            información consultable e interpretable.
-          </p>
+          <h2>{t('howItWorks.title')}</h2>
+          <p className="section-intro">{t('howItWorks.intro')}</p>
 
           <ol className="pipeline">
             <li>
-              <strong>Ingesta automatizada de datos:</strong>
-              Extracción continua de transcripciones oficiales desde gob.mx/presidencia,
-              incluyendo discursos, conferencias de prensa, entrevistas y comunicados.
-              Los datos se actualizan de forma periódica para mantener la base de conocimiento vigente.
+              <strong>{t('howItWorks.steps.ingestion.title')}</strong>
+              {t('howItWorks.steps.ingestion.description')}
             </li>
-
             <li>
-              <strong>Procesamiento y estructuración:</strong>
-              Limpieza del texto, segmentación en unidades discursivas y enriquecimiento con
-              metadatos estructurados (fecha, tipo de evento, orador, contexto institucional).
+              <strong>{t('howItWorks.steps.processing.title')}</strong>
+              {t('howItWorks.steps.processing.description')}
             </li>
-
             <li>
-              <strong>Representación semántica:</strong>
-              Conversión de cada fragmento discursivo en representaciones vectoriales
-              mediante modelos de lenguaje preentrenados (sentence transformers),
-              capturando significado y contexto más allá de palabras clave.
+              <strong>{t('howItWorks.steps.semantic.title')}</strong>
+              {t('howItWorks.steps.semantic.description')}
             </li>
-
             <li>
-              <strong>Almacenamiento e indexación vectorial:</strong>
-              Persistencia en una base de datos vectorial con índices HNSW,
-              optimizada para consultas de similitud semántica a gran escala.
+              <strong>{t('howItWorks.steps.storage.title')}</strong>
+              {t('howItWorks.steps.storage.description')}
             </li>
-
             <li>
-              <strong>Servicios de Análisis y Consulta:</strong> 
-              Exposición de capacidades analíticas mediante APIs: búsqueda semántica, preguntas y respuestas 
-              con RAG, y análisis de evolución narrativa a través de series temporales semánticas.
+              <strong>{t('howItWorks.steps.analysis.title')}</strong> 
+              {t('howItWorks.steps.analysis.description')}
             </li>
-
           </ol>
-          </section>
-
+        </section>
 
         {/* Project Context */}
         <section className="project-context">
-          <h2>Contexto del Proyecto</h2>
-          <p>
-            VozPública es un <strong>proyecto independiente de investigación y desarrollo.</strong> Forma parte de un portafolio profesional enfocado en:
-          </p>
+          <h2>{t('projectContext.title')}</h2>
+          <p>{t('projectContext.description')}</p>
           <ul>
-            <li>Arquitectura de sistemas de análisis de datos a gran escala</li>
-            <li>Implementación de pipelines de ML/NLP en producción</li>
-            <li>Diseño de interfaces para exploración de datos complejos</li>
-            <li>Aplicación de IA a problemas de ciencias sociales y análisis político</li>
+            {translations.projectContext.focus.map((item, index) => (
+              <li key={index}>{item}</li>
+            ))}
           </ul>
           <p className="disclaimer">
-            <em>Nota: Este es un proyecto no partidista y sin fines de lucro. El objetivo es demostrar 
-            aplicaciones tecnológicas avanzadas para análisis de discurso público.</em>
+            <em>{t('projectContext.disclaimer')}</em>
           </p>
         </section>
 
         {/* Contact Information */}
         <section className="contact">
-          <h2>Contacto</h2>
-          <p className="contact-intro">
-            Si te interesa el proyecto, su enfoque técnico o posibles colaboraciones,
-            no dudes en contactarme:
-          </p>
+          <h2>{t('contact.title')}</h2>
+          <p className="contact-intro">{t('contact.intro')}</p>
 
           <div className="contact-card">
             <div className="contact-header">
               <div className="avatar">DM</div>
               <h3>Diego Mancera</h3>
-              <p className="role">Data Scientist (Applied ML / AI Systems)</p>
+              <p className="role">{t('contact.role')}</p>
             </div>
             
             <div className="contact-links">
@@ -206,13 +161,10 @@ Encuentra fragmentos del discurso presidencial por significado, no solo por coin
             </div>
           </div>
         </section>
-
-
       </main>
 
-
       <footer>
-        <p>VozPública - Plataforma de Análisis de Discurso Político | Proyecto de Investigación Independiente</p>
+        <p>{t('footer')}</p>
       </footer>
     </div>
   );
