@@ -1,0 +1,100 @@
+# NOTE:
+# This workflow runs scheduled ingestion jobs.
+# Intended for early-stage deployment.
+# May migrate to Azure-native scheduling later.
+
+name: Daily Data Scraping
+
+on:
+  schedule:
+    # Run daily at 12:00 PM UTC (adjust timezone as needed)
+    - cron: '0 12 * * *'
+  workflow_dispatch: # Allow manual trigger
+
+env:
+  PYTHON_VERSION: '3.12'
+
+jobs:
+  scrape-data:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120 # 2 hour timeout for long scraping jobs
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+        cache: 'pip'
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install -r requirements-scraping.txt || true
+        playwright install chromium
+    
+    - name: Configure environment variables
+      run: |
+        # Database configuration from secrets
+        echo "PGHOST=${{ secrets.PGHOST }}" >> $GITHUB_ENV
+        echo "PGDATABASE=${{ secrets.PGDATABASE }}" >> $GITHUB_ENV
+        echo "PGUSER=${{ secrets.PGUSER }}" >> $GITHUB_ENV
+        echo "PGPASSWORD=${{ secrets.PGPASSWORD }}" >> $GITHUB_ENV
+        echo "PGPORT=${{ secrets.PGPORT }}" >> $GITHUB_ENV
+        
+        # Azure OpenAI configuration from secrets
+        echo "AZURE_OPENAI_API_KEY=${{ secrets.AZURE_OPENAI_API_KEY }}" >> $GITHUB_ENV
+        echo "AZURE_OPENAI_ENDPOINT=${{ secrets.AZURE_OPENAI_ENDPOINT }}" >> $GITHUB_ENV
+        echo "AZURE_OPENAI_EMBEDDING_DEPLOYMENT=${{ secrets.AZURE_OPENAI_EMBEDDING_DEPLOYMENT }}" >> $GITHUB_ENV
+        echo "AZURE_OPENAI_CHAT_DEPLOYMENT=${{ secrets.AZURE_OPENAI_CHAT_DEPLOYMENT }}" >> $GITHUB_ENV
+    
+    - name: Create logs directory
+      run: mkdir -p logs
+    
+    - name: Run metadata scraping
+      id: scrape-meta
+      run: |
+        echo "Starting metadata scraping at $(date)"
+        python -m backend.ingestion.extract_meta_main 2>&1 | tee logs/scrape-meta-$(date +%Y%m%d-%H%M%S).log
+        echo "Metadata scraping completed at $(date)"
+      continue-on-error: true
+    
+    - name: Run full transcript scraping
+      id: scrape-whole
+      run: |
+        echo "Starting full transcript scraping at $(date)"
+        python -m backend.ingestion.extract_whole_main 2>&1 | tee logs/scrape-whole-$(date +%Y%m%d-%H%M%S).log
+        echo "Full transcript scraping completed at $(date)"
+      continue-on-error: true
+    
+    - name: Generate summary report
+      if: always()
+      run: |
+        echo "# Scraping Run Summary" > logs/summary.txt
+        echo "Date: $(date)" >> logs/summary.txt
+        echo "Commit: ${{ github.sha }}" >> logs/summary.txt
+        echo "" >> logs/summary.txt
+        echo "## Metadata Scraping" >> logs/summary.txt
+        echo "Status: ${{ steps.scrape-meta.outcome }}" >> logs/summary.txt
+        echo "" >> logs/summary.txt
+        echo "## Full Transcript Scraping" >> logs/summary.txt
+        echo "Status: ${{ steps.scrape-whole.outcome }}" >> logs/summary.txt
+    
+    - name: Upload scraping logs as artifacts
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: scraping-logs-${{ github.run_number }}-${{ github.run_attempt }}
+        path: |
+          logs/
+          backend/ingestion/scraper.log
+        retention-days: 90 # Keep logs for 90 days
+    
+    - name: Check for failures and notify
+      if: failure()
+      run: |
+        echo "::error::One or more scraping jobs failed. Check artifacts for details."
+        exit 1
