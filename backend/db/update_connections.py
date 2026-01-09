@@ -121,7 +121,7 @@ def update_postprocessing_helpers():
     # Replace supabase upsert with direct SQL
     content = content.replace(
         '''
-    # Cargar embedded_df a la tabla 'speech_turns'
+    # Load embedded_df to 'speech_turns' table
     try:
         embedded_payload = df_to_records_serializable(embedded_df)
         supabase.table('speech_turns').upsert(embedded_payload).execute()
@@ -132,7 +132,7 @@ def update_postprocessing_helpers():
             raise
 ''',
         '''
-    # Cargar embedded_df a la tabla 'speech_turns'
+    # Load embedded_df to 'speech_turns' table
     try:
         embedded_payload = df_to_records_serializable(embedded_df)
         conn = psycopg2.connect(

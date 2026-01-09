@@ -2,7 +2,7 @@ from pydantic_settings import BaseSettings
 from pydantic import Field
 
 class Settings(BaseSettings):
-    # Database - usando alias para mapear variables PG* estándar
+    # Database - using aliases to map standard PG* variables
     postgres_host: str = Field(alias='PGHOST')
     postgres_port: int = Field(default=5432, alias='PGPORT')
     postgres_user: str = Field(alias='PGUSER')
@@ -19,11 +19,11 @@ class Settings(BaseSettings):
     class Config:
         env_file = ".env"
         env_file_encoding = "utf-8"
-        populate_by_name = True  # permite usar tanto el nombre como el alias
+        populate_by_name = True  # allows using both name and alias
 
 settings = Settings()
 
-# Exportar variables individuales para compatibilidad con código existente
+# Export individual variables for compatibility with existing code
 postgres_host = settings.postgres_host
 postgres_port = settings.postgres_port
 postgres_user = settings.postgres_user

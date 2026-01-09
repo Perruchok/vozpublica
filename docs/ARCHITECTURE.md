@@ -1,18 +1,18 @@
-# 🏗️ Arquitectura VozPública
+# 🏗️ VozPública Architecture
 
-## Diagrama de Arquitectura
+## Architecture Diagram
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│                         USUARIO                                  │
-│                      (Navegador Web)                             │
+│                          USER                                    │
+│                      (Web Browser)                               │
 └────────────────────────────┬────────────────────────────────────┘
                              │
                              │ HTTP Requests
                              ▼
 ┌─────────────────────────────────────────────────────────────────┐
 │                    FRONTEND (Next.js)                            │
-│                    Puerto: 3000                                  │
+│                    Port: 3000                                    │
 ├─────────────────────────────────────────────────────────────────┤
 │                                                                   │
 │  ┌─────────────┐  ┌──────────────┐  ┌──────────────┐           │
@@ -29,7 +29,7 @@
                                              ▼
 ┌─────────────────────────────────────────────────────────────────┐
 │                    BACKEND (FastAPI)                             │
-│                    Puerto: 8000                                  │
+│                    Port: 8000                                    │
 ├─────────────────────────────────────────────────────────────────┤
 │                                                                   │
 │  ┌─────────────────────────────────────────────────────────┐   │
@@ -52,8 +52,8 @@
 │                             ▼                                    │
 │  ┌─────────────────────────────────────────────────────────┐   │
 │  │                    Analytics                             │   │
-│  │  • drift.py - Análisis de cambio semántico              │   │
-│  │  • narrative_evolution.py - Evolución narrativa          │   │
+│  │  • drift.py - Semantic change analysis                  │   │
+│  │  • narrative_evolution.py - Narrative evolution          │   │
 │  └──────────────────────────┬───────────────────────────────┘   │
 │                             │                                    │
 └─────────────────────────────┼────────────────────────────────────┘
@@ -61,8 +61,8 @@
                               │ SQL Queries
                               ▼
 ┌─────────────────────────────────────────────────────────────────┐
-│                  BASE DE DATOS (PostgreSQL)                      │
-│                  con extensión pgvector                          │
+│                  DATABASE (PostgreSQL)                           │
+│                  with pgvector extension                         │
 ├─────────────────────────────────────────────────────────────────┤
 │                                                                   │
 │  ┌──────────────────┐  ┌──────────────────┐                    │
@@ -76,104 +76,104 @@
 └─────────────────────────────────────────────────────────────────┘
 ```
 
-## Flujo de una Petición Típica
+## Typical Request Flow
 
-### Ejemplo: Usuario busca evolución semántica de "seguridad pública"
+### Example: User searches for semantic evolution of "public security"
 
 ```
-1. USUARIO
-   └─> Ingresa "seguridad pública" en el formulario
-   └─> Selecciona fechas: 2024-01-01 a 2024-12-31
-   └─> Hace clic en "Analizar"
+1. USER
+   └─> Enters "public security" in the form
+   └─> Selects dates: 2024-01-01 to 2024-12-31
+   └─> Clicks "Analyze"
 
 2. FRONTEND (React Component)
-   └─> El componente captura el submit del formulario
-   └─> Llama a: fetchSemanticEvolution({ 
-         concept: "seguridad pública",
+   └─> Component captures form submission
+   └─> Calls: fetchSemanticEvolution({ 
+         concept: "public security",
          start_date: "2024-01-01",
          end_date: "2024-12-31"
        })
 
 3. API CLIENT (frontend/lib/api.js)
-   └─> Construye la URL: http://localhost:8000/api/semantic-evolution
-   └─> Hace fetch() con POST request
-   └─> Body: JSON con los parámetros
+   └─> Builds URL: http://localhost:8000/api/semantic-evolution
+   └─> Makes fetch() with POST request
+   └─> Body: JSON with parameters
 
 4. BACKEND - API ROUTER (backend/app/api/semantic_evolution.py)
-   └─> Recibe el POST request
-   └─> Valida los parámetros con Pydantic models
-   └─> Llama al service
+   └─> Receives POST request
+   └─> Validates parameters with Pydantic models
+   └─> Calls service
 
 5. BACKEND - SERVICE (backend/app/services/semantic_evolution_service.py)
-   └─> Procesa la lógica de negocio
-   └─> Llama a las funciones de analytics
+   └─> Processes business logic
+   └─> Calls analytics functions
 
 6. BACKEND - ANALYTICS (backend/analytics/drift.py)
-   └─> Genera embedding del concepto
-   └─> Consulta la base de datos con filtros temporales
-   └─> Calcula similitudes coseno
-   └─> Detecta drift semántico
+   └─> Generates concept embedding
+   └─> Queries database with temporal filters
+   └─> Calculates cosine similarities
+   └─> Detects semantic drift
 
-7. BASE DE DATOS
-   └─> Ejecuta queries con pgvector
-   └─> Retorna resultados con embeddings y metadatos
+7. DATABASE
+   └─> Executes queries with pgvector
+   └─> Returns results with embeddings and metadata
 
 8. BACKEND - RESPONSE
-   └─> Formatea los resultados
-   └─> Retorna JSON con:
+   └─> Formats results
+   └─> Returns JSON with:
        • Points: [{period, similarity, sample_texts}]
        • Drift: {magnitude, direction, explanation}
 
 9. FRONTEND - API CLIENT
-   └─> Recibe la respuesta JSON
-   └─> Parsea el response
-   └─> Retorna los datos al componente
+   └─> Receives JSON response
+   └─> Parses response
+   └─> Returns data to component
 
 10. FRONTEND - COMPONENT
-    └─> Actualiza el estado de React
-    └─> Re-renderiza con los nuevos datos
-    └─> Muestra:
-        • Gráficos de evolución
-        • Explicación del drift
-        • Ejemplos de textos
+    └─> Updates React state
+    └─> Re-renders with new data
+    └─> Displays:
+        • Evolution charts
+        • Drift explanation
+        • Text examples
 ```
 
-## Componentes Clave
+## Key Components
 
 ### Frontend
 
-| Archivo | Propósito |
+| File | Purpose |
 |---------|-----------|
-| `app/page.jsx` | Página principal (landing) |
-| `app/layout.jsx` | Layout global con metadata |
-| `app/narrative/page.jsx` | Página de análisis narrativo |
-| `lib/api.js` | Cliente API - hace las llamadas al backend |
-| `lib/constants.js` | Configuración y constantes |
-| `components/narrative/*` | Componentes UI específicos |
-| `styles/globals.css` | Estilos globales |
+| `app/page.jsx` | Main page (landing) |
+| `app/layout.jsx` | Global layout with metadata |
+| `app/narrative/page.jsx` | Narrative analysis page |
+| `lib/api.js` | API Client - makes backend calls |
+| `lib/constants.js` | Configuration and constants |
+| `components/narrative/*` | Specific UI components |
+| `styles/globals.css` | Global styles |
 
 ### Backend
 
-| Archivo | Propósito |
+| File | Purpose |
 |---------|-----------|
-| `app/main.py` | Punto de entrada, configuración CORS |
-| `app/api/*.py` | Routers - endpoints de la API |
-| `app/services/*.py` | Lógica de negocio |
-| `app/models/*.py` | Modelos Pydantic (validación) |
-| `analytics/*.py` | Algoritmos de análisis |
-| `utils/*.py` | Utilidades (DB, texto, etc.) |
-| `settings.py` | Configuración de la aplicación |
+| `app/main.py` | Entry point, CORS configuration |
+| `app/api/*.py` | Routers - API endpoints |
+| `app/services/*.py` | Business logic |
+| `app/models/*.py` | Pydantic models (validation) |
+| `analytics/*.py` | Analysis algorithms |
+| `utils/*.py` | Utilities (DB, text, etc.) |
+| `settings.py` | Application configuration |
 
-## Patrones de Diseño Utilizados
+## Design Patterns Used
 
 ### 1. **Separation of Concerns**
-- Frontend: solo UI y experiencia de usuario
-- Backend: lógica de negocio y acceso a datos
+- Frontend: only UI and user experience
+- Backend: business logic and data access
 
 ### 2. **API-First Design**
-- El backend expone una API RESTful
-- El frontend consume la API
-- Permite cambiar frontend sin tocar backend
+- The backend exposes a RESTful API
+- The frontend consumes the API
+- Allows changing frontend without touching backend
 
 ### 3. **Layered Architecture** (Backend)
 ```
@@ -187,28 +187,28 @@ Database
 ```
 
 ### 4. **Component-Based Architecture** (Frontend)
-- Componentes reutilizables
-- Estado local vs global
-- Props para comunicación entre componentes
+- Reusable components
+- Local vs global state
+- Props for component communication
 
-## Tecnologías Clave
+## Key Technologies
 
 ### Frontend Stack
-- **Next.js 14**: Framework React con SSR
-- **React 18**: Librería UI
-- **Fetch API**: Cliente HTTP nativo
+- **Next.js 14**: React framework with SSR
+- **React 18**: UI library
+- **Fetch API**: Native HTTP client
 
 ### Backend Stack
-- **FastAPI**: Framework web moderno
-- **Pydantic**: Validación de datos
-- **Uvicorn**: Servidor ASGI
-- **PostgreSQL + pgvector**: Base de datos vectorial
+- **FastAPI**: Modern web framework
+- **Pydantic**: Data validation
+- **Uvicorn**: ASGI server
+- **PostgreSQL + pgvector**: Vector database
 
-### Comunicación
-- **REST API**: JSON sobre HTTP
-- **CORS**: Habilitado para localhost:3000
+### Communication
+- **REST API**: JSON over HTTP
+- **CORS**: Enabled for localhost:3000
 
-## Variables de Entorno
+## Environment Variables
 
 ### Frontend
 ```env
@@ -221,32 +221,32 @@ DATABASE_URL=postgresql://...
 OPENAI_API_KEY=sk-...
 ```
 
-## Puertos
+## Ports
 
-| Servicio | Puerto | URL |
+| Service | Port | URL |
 |----------|--------|-----|
 | Frontend | 3000 | http://localhost:3000 |
 | Backend | 8000 | http://localhost:8000 |
-| Database | 5432 | (local o remoto) |
+| Database | 5432 | (local or remote) |
 
-## Próximos Pasos en tu Aprendizaje
+## Next Steps in Your Learning
 
-1. **Entiende el ciclo de vida de React**
+1. **Understand React lifecycle**
    - useState, useEffect
-   - Props y State
+   - Props and State
    - Event handlers
 
-2. **Aprende sobre Next.js App Router**
+2. **Learn about Next.js App Router**
    - File-based routing
    - Server vs Client Components
-   - Metadata y SEO
+   - Metadata and SEO
 
-3. **Domina las llamadas API**
+3. **Master API calls**
    - async/await
-   - Manejo de errores
+   - Error handling
    - Loading states
 
-4. **Explora React DevTools**
-   - Inspeccionar componentes
-   - Ver el state en tiempo real
-   - Profiling de performance
+4. **Explore React DevTools**
+   - Inspect components
+   - View state in real-time
+   - Performance profiling
