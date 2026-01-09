@@ -210,3 +210,5 @@ __marimo__/
 # Large data files
 db/supabase_data.json
 db/raw_transcripts.json
+
+frontend/.gitignore

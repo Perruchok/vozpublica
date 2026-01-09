@@ -1,0 +1,51 @@
+.Python
+*.py[cod]
+*$py.class
+*.so
+__pycache__/
+*.log
+
+# Environments
+.env
+.env.*
+venv/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Development
+dev/
+*.ipynb_checkpoints
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Frontend
+frontend/node_modules/
+frontend/.next/
+frontend/out/
+frontend/build/
+
+# Database
+*.sql~
+*.db
+
+# Documentation (keep generated docs out)
+docs/_build/
+
+# Temporary files
+*.tmp
+tmp/
+temp/
+nohup.out
+scraper.log
