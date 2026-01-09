@@ -1,6 +1,17 @@
 /** @type {import('next').NextConfig} */
+const path = require('path');
+
 const nextConfig = {
   reactStrictMode: true,
+  
+  // Webpack configuration for path aliases
+  webpack: (config) => {
+    config.resolve.alias = {
+      ...config.resolve.alias,
+      '@': path.resolve(__dirname),
+    };
+    return config;
+  },
   
   // API proxy configuration for development
   async rewrites() {
