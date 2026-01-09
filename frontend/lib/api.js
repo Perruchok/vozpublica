@@ -59,7 +59,7 @@ export async function fetchSemanticEvolution(params) {
     similarity_threshold = 0.75
   } = params;
 
-  return fetchAPI('/api/semantic-evolution', {
+  return fetchAPI('/api/v1/semantic-evolution', {
     method: 'POST',
     body: JSON.stringify({
       concept,
@@ -88,7 +88,7 @@ export async function fetchDriftExplanation(params) {
     similarity_threshold = 0.75
   } = params;
 
-  return fetchAPI('/api/explain-drift', {
+  return fetchAPI('/api/v1/explain-drift', {
     method: 'POST',
     body: JSON.stringify({
       concept,
@@ -106,7 +106,7 @@ export async function fetchDriftExplanation(params) {
  * @returns {Promise<Object>} Topic analysis data
  */
 export async function fetchTopicDiscovery(startDate, endDate) {
-  return fetchAPI('/api/analytics/topics', {
+  return fetchAPI('/api/v1/analytics/topics', {
     method: 'POST',
     body: JSON.stringify({
       start_date: startDate,
@@ -131,7 +131,7 @@ export async function fetchSpeakerProfile(speakerName) {
  * @returns {Promise<Object>} Search results with matching fragments
  */
 export async function searchSemanticDocuments(query, topK = 5) {
-  return fetchAPI('/api/search', {
+  return fetchAPI('/api/v1/search', {
     method: 'POST',
     body: JSON.stringify({
       question: query,
@@ -147,7 +147,7 @@ export async function searchSemanticDocuments(query, topK = 5) {
  * @returns {Promise<Object>} Answer with sources
  */
 export async function askQuestion(question, topK = 5) {
-  return fetchAPI('/api/question', {
+  return fetchAPI('/api/v1/question', {
     method: 'POST',
     body: JSON.stringify({
       question: question,
