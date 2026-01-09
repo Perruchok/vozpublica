@@ -38,11 +38,11 @@ client = AzureOpenAI(
     api_version=azure_openai_api_version
 )
 
-# Usar el nombre de deployment/modelo (definido en la celda de configuración)
-# AZURE_DEPLOYMENT debe existir en el entorno de ejecución (se definió en la celda anterior)
+# Use deployment/model name (defined in configuration cell)
+# AZURE_DEPLOYMENT must exist in execution environment (defined in previous cell)
 MODEL_FOR_ENCODING = globals().get("AZURE_DEPLOYMENT", "text-embedding-3-small")
 
-# Intentar obtener el encoding para el modelo desplegado; si falla, caer a cl100k_base
+# Try to get encoding for deployed model; if it fails, fall back to cl100k_base
 try:
     ENCODER = tiktoken.encoding_for_model(MODEL_FOR_ENCODING)
 except Exception:
@@ -217,8 +217,8 @@ def count_tokens(text: str) -> int:
     return len(ENCODER.encode(text))
 
 def chunk_text(text, max_tokens=450, overlap=50):
-    """Divide el texto en chunks usando el encoder del modelo.
-    Usa ventana deslizante con `overlap` tokens solapados entre chunks.
+    """Splits text into chunks using model encoder.
+    Uses sliding window with `overlap` tokens overlapping between chunks.
     """
     tokens = ENCODER.encode(text)
     chunks = []
@@ -231,7 +231,7 @@ def chunk_text(text, max_tokens=450, overlap=50):
         chunk_tokens = tokens[start:start+max_tokens]
         chunk_text = ENCODER.decode(chunk_tokens)
         chunks.append(chunk_text)
-        # avanzar con solapamiento
+        # advance with overlap
         start += max_tokens - overlap
 
     return chunks
@@ -241,25 +241,37 @@ def embed_text(text: str): # Embedding
     Generates embeddings using Azure OpenAI (2025 syntax).
     Accepts a string or list of strings.
     Returns a vector (list of floats).
+    Raises RuntimeError if embedding fails.
     """
-    response = client.embeddings.create(
-        model=azure_openai_embedding_deployment, 
-        input=text
-    )
-
-    # For a single input, return the 1 vector
-    return response.data[0].embedding
+    try:
+        response = client.embeddings.create(
+            model=azure_openai_embedding_deployment, 
+            input=text
+        )
+        # For a single input, return the 1 vector
+        return response.data[0].embedding
+    except Exception as e:
+        error_msg = (
+            f"❌ EMBEDDING ERROR\n"
+            f"Failed to generate embedding for text.\n"
+            f"Model: {azure_openai_embedding_deployment}\n"
+            f"Endpoint: {azure_openai_endpoint}\n"
+            f"Error: {str(e)}\n"
+            f"Text preview: {text[:100]}..."
+        )
+        print(error_msg)
+        raise RuntimeError(error_msg) from e
 
 def process_speech_turn(turn, max_tokens=450):
     """
-    Procesa una intervención del discurso:
-    - Si es pequeña (<= max_tokens): genera embedding directamente.
-    - Si es grande (> max_tokens): la divide en chunks y genera embeddings para cada chunk
+    Processes a speech turn:
+    - If small (<= max_tokens): generates embedding directly.
+    - If large (> max_tokens): splits it into chunks and generates embeddings for each chunk
     Args:
-        turn (dict): Diccionario con la intervención del discurso.
-        max_tokens (int): Número máximo de tokens por chunk.
+        turn (dict): Dictionary with speech turn.
+        max_tokens (int): Maximum number of tokens per chunk.
     Returns:
-        list: Lista de diccionarios con embeddings y metadatos.
+        list: List of dictionaries with embeddings and metadata.
     """
     text = turn["text"]
     token_count = count_tokens(text)
@@ -269,13 +281,13 @@ def process_speech_turn(turn, max_tokens=450):
     s_norm = turn.get("speaker_normalized")
     s_role = turn.get("role")
 
-    # Si la intervención es pequeña, solo 1 chunk
+    # If the intervention is small, only 1 chunk
     if token_count <= max_tokens:
         embedding = embed_text(text)
         return [{
             "doc_id": turn.get("doc_id"),
             "sequence": turn.get("sequence"),
-            "chunk_id": None,                      # no hay subdivisión
+            "chunk_id": None,                      # no subdivision
             "type": turn.get("type"),
             "speaker_raw": s_raw,
             "speaker_normalized": s_norm,
@@ -285,7 +297,7 @@ def process_speech_turn(turn, max_tokens=450):
             "token_count": token_count
         }]
 
-    # Si es grande → dividir en chunks
+    # If large → split into chunks
     chunks = chunk_text(text, max_tokens)
     results = []
 
@@ -309,12 +321,12 @@ def process_speech_turn(turn, max_tokens=450):
 
 def embed_single_article(conference_data, max_tokens=450):
     """
-    Procesa todas las intervenciones del discurso en los datos de la conferencia.
+    Processes all speech turns in conference data.
     Args:
-        conference_data (list): Lista de diccionarios con las intervenciones del discurso.
-        max_tokens (int): Número máximo de tokens por chunk.
+        conference_data (list): List of dictionaries with speech turns.
+        max_tokens (int): Maximum number of tokens per chunk.
     Returns:
-        list: Lista de diccionarios con embeddings y metadatos para todas las intervenciones.
+        list: List of dictionaries with embeddings and metadata for all turns.
     """
     all_embeddings = []
 
