@@ -3,8 +3,6 @@
   "devCommand": "npm run dev",
   "installCommand": "npm install",
   "outputDirectory": ".next",
-  "framework": "nextjs",
-  "rootDirectory": "frontend"
-  
+  "framework": "nextjs"
 }
 
