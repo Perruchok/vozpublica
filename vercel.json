@@ -1,7 +1,8 @@
 {
-  "installCommand": "npm install --prefix frontend",
-  "buildCommand": "npm run build --prefix frontend",
-  "devCommand": "npm run dev --prefix frontend",
-  "outputDirectory": "frontend/.next",
-  "framework": "nextjs"
+  "buildCommand": "npm run build",
+  "devCommand": "npm run dev",
+  "installCommand": "npm install",
+  "outputDirectory": ".next",
+  "framework": "nextjs",
+  "rootDirectory": "frontend"
 }
