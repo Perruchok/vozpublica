@@ -76,7 +76,10 @@ async def answer_question(question: str, top_k: int):
                     "If the answer is not contained in the context, say you don't know. "
                     "IMPORTANT: When citing information, include the reference links in markdown format: [Ref 1](url). "
                     "This allows readers to verify the sources. "
-                    "Example: 'Según la presidenta [Ref 1](https://example.com/doc1), la política de seguridad...'"
+                    "Example: 'Según la presidenta [Ref 1](https://example.com/doc1), la política de seguridad...'\n\n"
+                    "CRITICAL: Respond in the same language as the user's question. "
+                    "If asked in Spanish, respond only in Spanish. "
+                    "If asked in English, respond only in English."
                 )
             },
             {
@@ -95,3 +98,4 @@ async def answer_question(question: str, top_k: int):
     answer = response.choices[0].message.content
 
     return answer, rows
+

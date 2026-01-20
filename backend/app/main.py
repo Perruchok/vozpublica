@@ -32,7 +32,7 @@ def get_allowed_origins() -> List[str]:
     """
     Gets allowed origins based on the environment.
     In production: only specific domains from environment variable.
-    In development: localhost.
+    In development: localhost and any GitHub Codespaces domain.
     """
     environment = os.getenv("ENVIRONMENT", "production")
     
@@ -42,6 +42,7 @@ def get_allowed_origins() -> List[str]:
             "http://localhost:3001",
             "http://127.0.0.1:3000",
             "http://127.0.0.1:3001",
+            "https://*.app.github.dev",  # GitHub Codespaces
         ]
     
     # Production: use ALLOWED_ORIGINS environment variable
@@ -57,12 +58,18 @@ def get_allowed_origins() -> List[str]:
 # CORS configuration
 allowed_origins = get_allowed_origins()
 
-if not allowed_origins:
-    logger.error("No CORS origins configured. Set ALLOWED_ORIGINS environment variable.")
-    # In development, allow temporarily
-    if os.getenv("ENVIRONMENT") == "development":
+# In development, use permissive CORS; in production, require explicit configuration
+if os.getenv("ENVIRONMENT") == "development":
+    if not allowed_origins:
         allowed_origins = ["*"]
-        logger.warning("Using wildcard CORS for development")
+        logger.warning("Development mode: Using wildcard CORS for all origins")
+    else:
+        # In dev, append wildcard to support dynamic environments like Codespaces
+        if "*" not in allowed_origins:
+            allowed_origins.append("*")
+else:
+    if not allowed_origins:
+        logger.error("No CORS origins configured. Set ALLOWED_ORIGINS environment variable.")
 
 logger.info(f"CORS Configuration: {len(allowed_origins)} allowed origins", 
            extra={"origins": allowed_origins, "environment": os.getenv("ENVIRONMENT", "production")})
