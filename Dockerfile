@@ -49,13 +49,18 @@ COPY --chown=appuser:appuser requirements.txt .
 ENV PATH=/home/appuser/.local/bin:$PATH
 ENV PYTHONPATH=/app
 ENV PYTHONUNBUFFERED=1
+ENV ENVIRONMENT=production
+
+# Por defecto en producción, pero puede ser overrideado
+ARG ALLOWED_ORIGINS=""
+ENV ALLOWED_ORIGINS=${ALLOWED_ORIGINS}
 
 # Cambiar a usuario no-root
 USER appuser
 
-# Health check integrado
-HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
-  CMD curl -f http://localhost:8000/health || exit 1
+# Health check disabled for Azure Web App
+# Azure manages health checks via Application Settings
+# Use /health or /health/detailed endpoints manually if needed
 
 # Exponer puerto
 EXPOSE 8000
