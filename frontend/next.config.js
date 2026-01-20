@@ -2,7 +2,7 @@
 const path = require('path');
 
 const nextConfig = {
-  reactStrictMode: true,
+  reactStrictMode: false, // Disable for better compatibility with development
   
   // Webpack configuration for path aliases
   webpack: (config) => {
@@ -13,19 +13,7 @@ const nextConfig = {
     return config;
   },
   
-  // API proxy configuration for development
-  async rewrites() {
-    return [
-      {
-        source: '/api/:path*',
-        destination: process.env.NEXT_PUBLIC_API_URL 
-          ? `${process.env.NEXT_PUBLIC_API_URL}/api/:path*`
-          : 'http://localhost:8000/api/:path*',
-      },
-    ];
-  },
-
-  // Environment variables
+  // Environment variables - use NEXT_PUBLIC_API_URL if set, otherwise localhost
   env: {
     NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000',
   },

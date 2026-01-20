@@ -4,6 +4,9 @@ import { LanguageProvider } from '@/lib/languageContext';
 export const metadata = {
   title: 'VozPública',
   description: 'Análisis de discurso político con IA',
+  icons: {
+    icon: '/favicon.svg',
+  },
 };
 
 export default function RootLayout({ children }) {
